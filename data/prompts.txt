@@ -1,0 +1,18 @@
+# Writing prompts for style-transfer evaluation.
+# One prompt per line. Lines starting with # are ignored.
+
+Write a short essay about the role of technology in modern education.
+Describe a memorable experience from your life and what you learned from it.
+Argue for or against the idea that social media does more harm than good.
+Explain a complex technical concept to a general audience.
+Write about the importance of reading in personal development.
+Reflect on how your perspective on a topic has changed over time.
+Discuss the ethical implications of artificial intelligence in everyday life.
+Write a persuasive piece about why people should learn a second language.
+Describe a place that is meaningful to you and explain why.
+Analyze the relationship between creativity and discipline.
+Write about a challenge you overcame and the strategies you used.
+Discuss the value of failure as a learning experience.
+Explain why critical thinking is essential in the modern world.
+Write about the balance between individual freedom and collective responsibility.
+Reflect on what it means to communicate effectively in writing.
