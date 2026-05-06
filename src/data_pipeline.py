@@ -145,14 +145,12 @@ def build_style_instruction_dataset(
             {"role": "user", "content": prompt},
             {"role": "assistant", "content": passage},
         ]
-        formatted = tokenizer.apply_chat_template(
-            messages, tokenize=True, add_generation_prompt=False,
-            max_length=max_length, truncation=True,
+        text_out = tokenizer.apply_chat_template(
+            messages, tokenize=False, add_generation_prompt=False,
         )
-        records.append({
-            "input_ids": formatted,
-            "labels": formatted.copy(),
-        })
+        ids = tokenizer.encode(text_out, add_special_tokens=False,
+                               max_length=max_length, truncation=True)
+        records.append({"input_ids": ids, "labels": ids.copy()})
 
     # Also add raw CLM passages formatted as assistant turns for diversity
     random.seed(42)
@@ -162,14 +160,12 @@ def build_style_instruction_dataset(
             {"role": "user", "content": random.choice(prompts)},
             {"role": "assistant", "content": text},
         ]
-        formatted = tokenizer.apply_chat_template(
-            messages, tokenize=True, add_generation_prompt=False,
-            max_length=max_length, truncation=True,
+        text_out = tokenizer.apply_chat_template(
+            messages, tokenize=False, add_generation_prompt=False,
         )
-        records.append({
-            "input_ids": formatted,
-            "labels": formatted.copy(),
-        })
+        ids = tokenizer.encode(text_out, add_special_tokens=False,
+                               max_length=max_length, truncation=True)
+        records.append({"input_ids": ids, "labels": ids.copy()})
 
     logger.info("Built %d style-instruction training samples", len(records))
     return Dataset.from_list(records)
