@@ -4,6 +4,7 @@ style-adapted model for a list of prompts.
 """
 
 import logging
+import re
 from dataclasses import dataclass
 
 import torch
@@ -33,6 +34,13 @@ def _build_generation_config(gen_cfg: GenerationConfig) -> HFGenerationConfig:
     )
 
 
+def _strip_thinking(text: str) -> str:
+    """Remove Qwen3.5 <think>...</think> reasoning blocks, keeping only
+    the final answer portion."""
+    stripped = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL)
+    return stripped.strip()
+
+
 def _generate_response(
     model,
     tokenizer,
@@ -48,8 +56,11 @@ def _generate_response(
         messages.append({"role": "system", "content": system_prompt})
     messages.append({"role": "user", "content": prompt_text})
 
+    # enable_thinking=False tells Qwen3.5 to skip the <think> reasoning
+    # block and produce the answer directly.
     input_text = tokenizer.apply_chat_template(
         messages, tokenize=False, add_generation_prompt=True,
+        enable_thinking=False,
     )
 
     inputs = tokenizer(input_text, return_tensors="pt").to(device)
@@ -61,9 +72,9 @@ def _generate_response(
             pad_token_id=tokenizer.pad_token_id,
         )
 
-    # Strip the input tokens to get only the generated portion
     new_tokens = output_ids[0][inputs["input_ids"].shape[1]:]
-    return tokenizer.decode(new_tokens, skip_special_tokens=True).strip()
+    raw = tokenizer.decode(new_tokens, skip_special_tokens=True).strip()
+    return _strip_thinking(raw)
 
 
 def generate_base_responses(
@@ -107,7 +118,7 @@ def generate_adapted_responses(
         logger.info("Adapted inference [%d/%d]: %s", i, len(prompts), prompt[:80])
         resp = _generate_response(
             model, tokenizer, prompt,
-            system_prompt=STYLE_SYSTEM_PROMPT,
+            system_prompt=None,
             gen_config=gen_config,
             device=device,
         )
