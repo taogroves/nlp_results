@@ -63,7 +63,7 @@ def load_base_model(
 
     quant_config = _quantization_config(hw) if load_in_4bit else None
 
-    attn_impl = "flash_attention_2" if (use_flash_attention and hw.use_flash_attention) else "eager"
+    attn_impl = "eager"
 
     logger.info(
         "Loading %s  quant=%s  attn=%s  device=%s",
